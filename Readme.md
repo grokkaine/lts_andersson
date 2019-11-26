@@ -1,10 +1,14 @@
 # CRISPR analysis in Baltic metagenomes
 
-This repository contains Andersson project source files, with Sergiu 
-Netotea as main and Mikael Huss as co-contributor. Most work is 
-summarized in the form of multiple Jupyter notebooks,
-in the /notebooks folder, and only some of the code was sourced.
+Research project by Anders Andersson, with research support from NBIS.
 
+Code contributions from Sergiu Netotea and Anders Andersson.
+Co-contributors: Mikael Huss and Johannes Alneberg.
+
+[http://envgen.github.io/](http://envgen.github.io/)
+
+Most work is summarized in the form of multiple Jupyter notebooks,
+in the /notebooks folder, and only some of the code was sourced.
 The code was used either from the processing pipeline or from the
 notebooks, therefore there is no main script, or command line options,
 or even clear inputs and outputs. Instead individual functions are 
