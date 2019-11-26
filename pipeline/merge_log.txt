@@ -1,0 +1,10 @@
+Timestamp: 2017-02-27 11:02:25
+Output to/home/sergiu/data/local/andersson/asko/merged.fastq.gz
+Timestamp: 2017-02-27 11:02:25
+Adding file:/home/sergiu/data/local/andersson/asko/trimmed/SRR3745603_1.trimmed.fastq.gz
+Timestamp: 2017-02-27 11:02:59
+Adding file:/home/sergiu/data/local/andersson/asko/trimmed/SRR3745607_1.trimmed.fastq.gz
+Timestamp: 2017-02-27 11:04:23
+Adding file:/home/sergiu/data/local/andersson/asko/trimmed/SRR3745603_2.trimmed.fastq.gz
+Timestamp: 2017-02-27 11:04:45
+Adding file:/home/sergiu/data/local/andersson/asko/trimmed/SRR3745607_2.trimmed.fastq.gz

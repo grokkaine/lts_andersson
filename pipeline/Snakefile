@@ -1,0 +1,46 @@
+"""
+Snakemake for Andersson project.
+Purpose: Download and clean Asko dataset from SRA.
+
+Run:
+$ snakemake --latency-wait 60
+$ snakemake -s mysnakefile myrule
+
+snakemake -s /media/sergiu/workpc/data/work/andersson/src/src/snakemake/Snakefile
+wget ftp://ftp-trace.ncbi.nih.gov/sra/sra-instant/reads/ByRun/sra/SRR/SRR374/SRR3745603/SRR3745603.sra -O /home/sergiu/data/local/andersson/asko/SRR3745603.sra
+fastq-dump --gzip --split-files /home/sergiu/data/local/andersson/asko/SRR3745603.sra
+"""
+import yaml
+import os
+
+# for not submitting cluster jobs
+# localrules: all
+
+#configure_path = "/proj/uppstore2017124/b2010008_nobackup/projects/crispr/data/lmo_all/test/src/configure.yaml"
+configure_path = "/proj/uppstore2017124/b2010008_nobackup/projects/crispr/sergiu/src/configure.yaml"
+#configure_path = "/media/sergiu/workpc/data/work/andersson/src/src/configure.yaml"
+
+config = None
+print("Reading the YAML config file...")
+with open(configure_path, 'r') as f:
+    jobs = yaml.load_all(f)
+    for job in jobs:
+        if job["run"]:
+            config = job
+            print("Running rules:", config["name"])
+
+if config["name"] == "LMO_all_rackham" or config["name"] == "LMO_all_test_rackham":
+    print("Including rules/lmo_new.rules")
+    include: "rules/lmo_new.rules"
+if config["name"] == "asko_uppmax":
+    include: "rules/asko.rules"
+if config["name"] == "lmo_uppmax":
+    include: "rules/lmo.rules"
+if config["name"] == "transect_uppmax":
+    include: "rules/transect.rules"
+
+
+rule all:
+    input:
+        #file=expand(os.path.join(config["run_dir"],"reindexed","{sample_name}_{orientation}_rei.fq.gz"),sample_name=config["sample_names"],orientation=['R1','R2'])
+        file=os.path.join(config["run_dir"],"crass","crass.crispr")

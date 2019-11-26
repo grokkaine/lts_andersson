@@ -1,0 +1,119 @@
+
+
+rule sra_download:
+    """Download the SRA data"""
+    # http://www.annotathon.org/courses/ABD/practical/snakemake/snake_intro.html
+    # first create tmp txt file using expand then make a sample wise rule for download
+    output:
+        sra_files=expand(os.path.join(config["run_dir"],"samples","{sample_name}.sra"),sample_name=config["sample_names"])
+    params:
+        odir=os.path.join(config["run_dir"],"samples")
+    run:
+        for sample in config["sample_names"]:
+            param = {'sample_name': sample}
+            link = "ftp://ftp-trace.ncbi.nih.gov/sra/sra-instant/reads/ByRun/sra/"
+            link += "{sample_name:.3}/{sample_name:.6}/{sample_name}/{sample_name}.sra".format(**param)
+            outfile = os.path.join(config["run_dir"], "samples", sample + ".sra")
+            shell("wget {link} -O {outfile}")
+
+
+rule sra_unpack:
+    input:
+        sra_file=os.path.join(config["run_dir"],"samples","{sample_name}.sra")
+    output:
+        sample_1=os.path.join(config["run_dir"],"samples","{sample_name}_1.fastq.gz"),
+        sample_2=os.path.join(config["run_dir"],"samples","{sample_name}_2.fastq.gz")
+    params:
+        odir=os.path.join(config["run_dir"],"samples")
+    shell:
+        """
+        cd {params.odir} && fastq-dump --gzip --split-files {input.sra_file}
+        """
+
+
+rule trimming:
+    """Trim reads using Cutadapt"""
+    input:
+        sample_1=os.path.join(config["run_dir"],"samples","{sample_name}_1.fastq.gz"),
+        sample_2=os.path.join(config["run_dir"],"samples","{sample_name}_2.fastq.gz")
+    output:
+        sample_1=os.path.join(config["run_dir"],"trimmed","{sample_name}_1.trimmed.fastq.gz"),
+        sample_2=os.path.join(config["run_dir"],"trimmed","{sample_name}_2.trimmed.fastq.gz"),
+        log=os.path.join(config["run_dir"],"cutadapt","{sample_name}_trimmed.log")
+    params: adapter="AGATCGGAAGAG"
+    shell:
+        """
+        cutadapt -m 50 --length-tag "length=" -q 20 -a {params.adapter} \
+        -A {params.adapter} -o {output.sample_1} -p {output.sample_2} \
+        {input.sample_1} {input.sample_2} > {output.log}
+        """
+
+
+rule fastqc:
+    """FastQC"""
+    input:
+        sample_1=os.path.join(config["run_dir"],"samples","{sample_name}_1.fastq.gz"),
+        sample_2=os.path.join(config["run_dir"],"samples","{sample_name}_2.fastq.gz"),
+        trimmed_sample_1=os.path.join(config["run_dir"],"trimmed","{sample_name}_1.trimmed.fastq.gz"),
+        trimmed_sample_2=os.path.join(config["run_dir"],"trimmed","{sample_name}_2.trimmed.fastq.gz")
+    output:
+        log1=os.path.join(config["run_dir"],"samples","qc","{sample_name}_log.txt"),
+        log2=os.path.join(config["run_dir"],"trimmed","qc","{sample_name}_log.txt")
+    params:
+        out_dir1=os.path.join(config["run_dir"],"samples","qc"),
+        out_dir2=os.path.join(config["run_dir"],"trimmed","qc"),
+        location=config["location"]
+    log:
+        # TODO
+    shell:
+        """
+        # use /home/sergiu/programs/FastQC/ on workpc
+        fastqc --noextract -o {params.out_dir1} --nogroup {input.sample_1} {input.sample_2} >>{output.log1} 2>&1
+        fastqc --noextract -o {params.out_dir2} --nogroup {input.trimmed_sample_1} {input.trimmed_sample_2} >>{output.log2} 2>&1
+        # if [ location = "workpc"]
+        # then
+        # /home/sergiu/programs/FastQC/fastqc --noextract -o {params.out_dir1} --nogroup {input.sample_1} {input.sample_2} >>{output.log1} 2>&1
+        # /home/sergiu/programs/FastQC/fastqc --noextract -o {params.out_dir2} --nogroup {input.trimmed_sample_1} {input.trimmed_sample_2} >>{output.log2} 2>&1
+        # fi
+        """
+
+
+rule merge_samples:
+    """Download the SRA data"""
+    input:
+        log1=expand(os.path.join(config["run_dir"],"samples","qc","{sample_name}_log.txt"),sample_name=config["sample_names"]),
+        log2=expand(os.path.join(config["run_dir"],"trimmed","qc","{sample_name}_log.txt"),sample_name=config["sample_names"])
+    output:
+        file=os.path.join(config["run_dir"],"asko_merged.fastq.gz")
+    params:
+        sample_list=expand("{sample_name}_R1",sample_name=config["sample_names"])+expand("{sample_name}_R2",sample_name=config["sample_names"]),
+        file_list=expand(os.path.join(config["run_dir"],"trimmed","{sample_name}_1.trimmed.fastq.gz"),sample_name=config["sample_names"]) + \
+                  expand(os.path.join(config["run_dir"],"trimmed","{sample_name}_2.trimmed.fastq.gz"),sample_name=config["sample_names"])
+    run:
+        import sys
+        if not config["source_path"] in sys.path:
+            sys.path.append(config["source_path"])
+        import preprocessing
+        #preprocessing.test(output.file)
+        print("The files to be merged:")
+        print(params.file_list)
+        print("The samples to be merged:")
+        print(params.sample_list)
+        preprocessing.merge_fq(output.file, params.file_list, params.sample_list)
+
+
+rule run_crass:
+    """Run the CRASS program to retrieve CRISPR sequences"""
+    input:
+        file=os.path.join(config["run_dir"],"asko_merged.fastq.gz")
+    output:
+        file=os.path.join(config["run_dir"],"crass","crass.crispr")
+    params:
+        crass_location=config["crass_location"],
+        outdir=os.path.join(config["run_dir"],"crass")
+    shell:
+        """
+        mkdir -p {params.outdir}
+        cd {params.outdir}
+        {params.crass_location}crass -o ./ -l 3 {input.file} >./run_lmo.log 2>&1
+        """

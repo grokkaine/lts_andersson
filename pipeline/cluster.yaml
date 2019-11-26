@@ -1,0 +1,29 @@
+__default__:
+  account: "snic2017-1-581"
+  time: "2-00:00:00"
+  n: 1
+  partition: "core"
+
+merge_samples:
+  account: "snic2017-1-581"
+  time: "9-00:00:00"
+  n: 2
+  partition: "core"
+
+sra_unpack:
+  account: "snic2017-1-581"
+  time: "3-00:00:00"
+  n: 2
+  partition: "core"
+
+run_test_crass:
+  account: "snic2017-1-581"
+  time: "10:00:00"
+  n: 2
+  partition: "core"
+
+run_crass:
+  account: "snic2017-1-581"
+  time: "9-00:00:00"
+  n: 1
+  partition: "node"

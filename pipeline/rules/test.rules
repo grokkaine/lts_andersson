@@ -1,0 +1,80 @@
+rule sra_download:
+    """Download the SRA data"""
+    output:
+        sra_files=expand(os.path.join(config["run_dir"],"samples","{sample_name}.sra"),sample_name=config["sample_names"])
+    params:
+        odir=os.path.join(config["run_dir"],"samples")
+    run:
+        for sample in config["sample_names"]:
+            param = {'sample_name': sample}
+            link = "ftp://ftp-trace.ncbi.nih.gov/sra/sra-instant/reads/ByRun/sra/"
+            link += "{sample_name:.3}/{sample_name:.6}/{sample_name}/{sample_name}.sra".format(**param)
+            outfile = os.path.join(config["run_dir"], "samples", sample + ".sra")
+            shell("wget {link} -O {outfile}")
+
+
+rule sra_unpack:
+    input:
+        sra_file=os.path.join(config["run_dir"],"samples","{sample_name}.sra")
+    output:
+        sample_1=os.path.join(config["run_dir"],"samples","{sample_name}_1.fastq.gz"),
+        sample_2=os.path.join(config["run_dir"],"samples","{sample_name}_2.fastq.gz")
+    params:
+        odir=os.path.join(config["run_dir"],"samples")
+    shell:
+        """
+        cd {params.odir} && fastq-dump --gzip --split-files {input.sra_file}
+        """
+
+
+rule trimming:
+    """Trim reads using Cutadapt"""
+    input:
+        sample_1=os.path.join(config["run_dir"],"samples","{sample_name}_1.fastq.gz"),
+        sample_2=os.path.join(config["run_dir"],"samples","{sample_name}_2.fastq.gz")
+    output:
+        sample_1=os.path.join(config["run_dir"],"trimmed","{sample_name}_1.trimmed.fastq.gz"),
+        sample_2=os.path.join(config["run_dir"],"trimmed","{sample_name}_2.trimmed.fastq.gz"),
+        log=os.path.join(config["run_dir"],"cutadapt","{sample_name}_trimmed.log")
+    params: adapter="AGATCGGAAGAG"
+    shell:
+        """
+        cutadapt -m 50 --length-tag "length=" -q 20 -a {params.adapter} \
+        -A {params.adapter} -o {output.sample_1} -p {output.sample_2} \
+        {input.sample_1} {input.sample_2} > {output.log}
+        """
+
+
+rule reindex_samples:
+    input:
+        file=os.path.join(config["raw_files_dir"],"{sample_name}_R{orientation}.fq.gz")
+    output:
+        file=os.path.join(config["run_dir"],"reindexed","{sample_name}_R{orientation}_reindexed.fastq.gz")
+    params:
+        reindexing_script=os.path.join(config["source_path"],"scripts","reindex.py")
+    shell:
+        """
+        set -e
+        set -o pipefail
+        python3 {params.reindexing_script} <(gunzip -c {input.file}) >(gzip --stdout >{output.file})
+        """
+
+
+rule run_crass:
+    """Run the CRASS program to retrieve CRISPR sequences"""
+    input:
+        files=expand(os.path.join(config["run_dir"],"reindexed","{sample_name}_{orientation}_reindexed.fastq.gz"),sample_name=config["sample_names"],orientation=['R1','R2'])
+    output:
+        file=os.path.join(config["run_dir"],"crass","crass.crispr")
+    params:
+        crass_location=config["crass_location"],
+        outdir=os.path.join(config["run_dir"],"crass")
+    shell:
+        """
+        set -e
+        set -o pipefail
+        mkdir -p {params.outdir}
+        cd {params.outdir}
+        {params.crass_location}crass -o ./ -l 3 <(cat {input.files}) >./run.log 2>&1
+        #cat <(zcat {input.files}) > {params.outdir}/crass.crispr
+        """

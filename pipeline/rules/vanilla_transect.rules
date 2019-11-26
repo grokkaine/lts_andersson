@@ -1,0 +1,36 @@
+
+
+rule merge_samples:
+    """Download the SRA data"""
+    input:
+        file_list=expand(os.path.join(config["raw_files_dir"],"{sample_name}_with_i_s_R1.fq.gz"),sample_name=config["sample_names"]) + \
+                  expand(os.path.join(config["raw_files_dir"],"{sample_name}_with_i_s_R2.fq.gz"),sample_name=config["sample_names"])
+    output:
+        file=os.path.join(config["run_dir"],"transect_merged.fastq.gz")
+    params:
+        sample_list=expand("{sample_name}_R1",sample_name=config["sample_names"])+expand("{sample_name}_R2",sample_name=config["sample_names"])
+    run:
+        import sys
+        if not config["source_path"] in sys.path:
+            sys.path.append(config["source_path"])
+        import preprocessing
+        #preprocessing.test(output.file)
+        print("Input.file_list",input.file_list)
+        print("Params.sample_list",params.sample_list)
+        preprocessing.merge_fq(output.file, input.file_list, params.sample_list)
+
+
+rule run_crass:
+    """Run the CRASS program to retrieve CRISPR sequences"""
+    input:
+        file=os.path.join(config["run_dir"],"transect_merged.fastq.gz")
+    output:
+        file=os.path.join(config["run_dir"],"crass.crispr")
+    params:
+        crass_location=config["crass_location"],
+        outdir=os.path.join(config["run_dir"],"crass")
+    shell:
+        """
+        cd {params.outdir}
+        {params.crass_location}crass -o ./ -l 3 {input.file} >./run.log 2>&1
+        """

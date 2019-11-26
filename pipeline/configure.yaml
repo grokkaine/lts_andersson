@@ -1,0 +1,155 @@
+# Configuration file for running the project file pipeline
+# Made following YAML 1.2 specs:
+# http://www.yaml.org/spec/1.2/spec.html
+
+name: LMO_all_rackham
+description: Snakemake processing of the combined LMO samples
+location: rackham
+date: 22 mar 2018
+run: yes
+# directory path to the source code
+source_path: "/proj/uppstore2017124/b2010008_nobackup/projects/crispr/sergiu/src/"
+# directory path to the temporary sbatch submission script
+run_dir: "/proj/uppstore2017124/b2010008_nobackup/projects/crispr/data/lmo_all/"
+# SRA sample names
+sample_names: ['120813', 'P4201_117', '121123', 'P4201_123', 'P4201_120', 'P4201_109', 'P4201_111', '120322', '120604', '120924', '121022', 'P4201_107', '120516', '121220', 'P4201_114', '120920', 'P4201_122', '120423', '121001', 'P4201_105', '120507', '120328', '120717', 'P4201_108', '120314', '120802', '121015', 'P4201_118', '120403', '121128', '120705', '120903', '120419', '120823', '120613', '120820', 'P4201_104', 'P4201_103', '120628', 'P4201_101', '120709', 'P4201_119', 'P4201_110', 'P4201_121', 'P4201_124', '120416', '120521', '120806', '120619', 'P4201_102', '121004', 'P4201_106', 'P4201_116', '121105', 'P4201_112', '120531', '121028', '120828', '120910']
+crass_location: "/home/sergiun/bin/crass/bin/"
+...
+---
+name: LMO_all_test_rackham
+description: Snakemake processing of the three MiSeq ASKO samples
+location: rackham
+date: 14 feb 2018
+run: no
+# directory path to the source code
+source_path: "/proj/uppstore2017124/b2010008_nobackup/projects/crispr/data/lmo_all/test/src/"
+# directory path to the temporary sbatch submission script
+run_dir: "/proj/uppstore2017124/b2010008_nobackup/projects/crispr/data/lmo_all/test/"
+# SRA sample names
+sample_names: ['121123']
+crass_location: "/home/sergiun/bin/crass/bin/"
+...
+---
+name: transect_local
+description: Snakemake processing  of the transect data
+location: workpc
+date: 18 aug 2017
+run: no
+# file path to the template script
+source_path: "/media/sergiu/workpc/data/work/andersson/src/src"
+sample_names: ['P1994_105', 'P1994_110', 'P1994_118', 'P1994_122', 'P1994_112', 'P1994_104', 'P1994_103', 'P1994_126', 'P1994_123', 'P1994_129', 'P1994_107', 'P1994_119', 'P1994_109', 'P1994_124', 'P1994_127', 'P1994_114']
+vanilla_sample_names: ['P1994_116', 'P1994_111', 'P1994_117', 'P1994_128', 'P1994_120', 'P1994_113', 'P1994_108', 'P1994_130', 'P1994_101', 'P1994_102', 'P1994_106', 'P1994_115', 'P1994_121', 'P1994_125', 'P1994_105', 'P1994_110', 'P1994_118', 'P1994_122', 'P1994_112', 'P1994_104', 'P1994_103', 'P1994_126', 'P1994_123', 'P1994_129', 'P1994_107', 'P1994_119', 'P1994_109', 'P1994_124', 'P1994_127', 'P1994_114']
+run_dir: "/media/sergiu/workpc/tmp/test"
+crass_location: "/media/sergiu/workpc/tmp/test"
+# location of the raw files
+raw_files_dir: "/media/sergiu/workpc/tmp/test"
+...
+---
+name: lmo_uppmax
+description: Snakemake processing  of the LMO data
+location: uppmax
+date: 10 nov 2017
+run: no
+# file path to the template script
+source_path: "/proj/b2010008/nobackup/projects/crispr/sergiu/src/"
+sample_names: ['P4201_112', 'P4201_122', 'P4201_101', 'P4201_106', 'P4201_120', 'P4201_118', 'P4201_111', 'P4201_110', 'P4201_121', 'P4201_107', 'P4201_119', 'P4201_104', 'P4201_124', 'P4201_105', 'P4201_109', 'P4201_108', 'P4201_114', 'P4201_123', 'P4201_116', 'P4201_117', 'P4201_102', 'P4201_103']
+run_dir: "/proj/b2010008/nobackup/projects/crispr/data/lmo_2013_2014/"
+crass_location: "/proj/b2010008/nobackup/projects/crispr/sergiu/bin/bin/"
+# location of the raw files
+raw_files_dir: "/pica/v9/b2014214_nobackup/preprocessing/fastuniq/quality_adapter_no_indices/"
+...
+---
+name: transect_uppmax
+description: Snakemake processing  of the transect data
+location: uppmax
+date: 18 aug 2017
+run: no
+# file path to the template script
+source_path: "/proj/b2010008/nobackup/projects/crispr/sergiu/src/"
+sample_names: ['P1994_105', 'P1994_110', 'P1994_118', 'P1994_122', 'P1994_112', 'P1994_104', 'P1994_103', 'P1994_126', 'P1994_123', 'P1994_129', 'P1994_107', 'P1994_119', 'P1994_109', 'P1994_124', 'P1994_127', 'P1994_114']
+vanilla_sample_names: ['P1994_116', 'P1994_111', 'P1994_117', 'P1994_128', 'P1994_120', 'P1994_113', 'P1994_108', 'P1994_130', 'P1994_101', 'P1994_102', 'P1994_106', 'P1994_115', 'P1994_121', 'P1994_125', 'P1994_105', 'P1994_110', 'P1994_118', 'P1994_122', 'P1994_112', 'P1994_104', 'P1994_103', 'P1994_126', 'P1994_123', 'P1994_129', 'P1994_107', 'P1994_119', 'P1994_109', 'P1994_124', 'P1994_127', 'P1994_114']
+run_dir: "/proj/b2010008/nobackup/projects/crispr/data/transect/"
+crass_location: "/proj/b2010008/nobackup/projects/crispr/sergiu/bin/bin/"
+# location of the raw files
+raw_files_dir: "/pica/v9/b2014214_nobackup/BARM/internal_standards/unmapped_reads/"
+...
+---
+name: asko_uppmax
+description: Snakemake processing of ASKO samples
+location: uppmax
+date: 14 feb 2017
+run: no
+# file path to the template script
+source_path: "/proj/b2010008/nobackup/projects/crispr/sergiu/src/"
+# directory path to the temporary sbatch submission script
+run_dir: "/proj/b2010008/nobackup/projects/crispr/data/asko/"
+# SRA sample names
+sample_names: ['SRR3727523', 'SRR3727518', 'SRR3727515', 'SRR3727513', 'SRR3727509', 'SRR3727505']
+test_sample_names: ['SRR3745603', 'SRR3745607']
+crass_location: "/proj/b2010008/nobackup/projects/crispr/sergiu/bin/bin/"
+...
+---
+name: askoSM_workpc
+description: Snakemake processing of ASKO samples
+location: workpc
+date: 12 dec 2016
+run: no
+# file path to the template script
+source_path: "/home/sergiu/data/data/work/andersson/src/andersson/src/"
+# directory path to the temporary sbatch submission script
+run_dir: "/home/sergiu/data/local/andersson/asko/"
+# SRA sample names
+sample_names: ['SRR3745603', 'SRR3745607']
+...
+---
+name: downloadSRA
+description: download the Asko SRA samples
+location: UPPMAX
+date: 28 dec 2016
+run: no
+# file path to the template script
+template_fpath: "/proj/b2010008/nobackup/projects/crispr/sergiu/src/uppmax/sra.sh"
+# directory path to the temporary sbatch submission script
+run_dir: "/proj/b2010008/nobackup/projects/crispr/sergiu/tmp/"
+# download location
+download_loc: "/proj/b2010008/nobackup/projects/crispr/sergiu/tmp/"
+# SRA sample names
+sample_names: ['SRS1529996']
+bkup_sample_names: ['SRS1529996', 'SRS1529991', 'SRS1529987', 'SRS1529983', 'SRS1530001', 'SRS1529993']
+...
+---
+name: testCrass
+run: no
+samples: [121123_R1, 121123_R2]
+sample_source: "/home/sergiu/data/data/andersson/120_samples"
+crass_output: "/home/sergiu/data/data/andersson/120_crass"
+tasks:
+- name: run_crass_pc
+  description: Test Crass on the work PC
+...
+# workpc config
+---
+name: workpc
+run: no
+
+# UPPMAX config
+---
+task: UPPMAX
+run: no
+...
+---
+name: merge_tsamples
+description: Merge all given files into a single fastq file
+location: UPPMAX
+date: 14 sep 2016
+run: no
+depends: no
+# sample directory, where the raw samples are
+sample_dir: "/proj/b2014214/nobackup/BARM/fastuniq/quality_adapter_no_indices/"
+# the sample filenames to be merged
+sample_filenames: ['120314_R1.fq.gz', '120322_R1.fq.gz', '120328_R1.fq.gz', '120403_R1.fq.gz', '120416_R1.fq.gz', '120419_R1.fq.gz', '120423_R1.fq.gz', '120507_R1.fq.gz', '120516_R1.fq.gz', '120521_R1.fq.gz', '120531_R1.fq.gz', '120604_R1.fq.gz', '120613_R1.fq.gz', '120619_R1.fq.gz', '120628_R1.fq.gz', '120705_R1.fq.gz', '120709_R1.fq.gz', '120717_R1.fq.gz', '120802_R1.fq.gz', '120806_R1.fq.gz', '120813_R1.fq.gz', '120820_R1.fq.gz', '120823_R1.fq.gz', '120828_R1.fq.gz', '120903_R1.fq.gz', '120910_R1.fq.gz', '120920_R1.fq.gz', '120924_R1.fq.gz', '121001_R1.fq.gz', '121004_R1.fq.gz', '121015_R1.fq.gz', '121022_R1.fq.gz', '121028_R1.fq.gz', '121105_R1.fq.gz', '121123_R1.fq.gz', '121128_R1.fq.gz', '121220_R1.fq.gz', '120314_R2.fq.gz', '120322_R2.fq.gz', '120328_R2.fq.gz', '120403_R2.fq.gz', '120416_R2.fq.gz', '120419_R2.fq.gz', '120423_R2.fq.gz', '120507_R2.fq.gz', '120516_R2.fq.gz', '120521_R2.fq.gz', '120531_R2.fq.gz', '120604_R2.fq.gz', '120613_R2.fq.gz', '120619_R2.fq.gz', '120628_R2.fq.gz', '120705_R2.fq.gz', '120709_R2.fq.gz', '120717_R2.fq.gz', '120802_R2.fq.gz', '120806_R2.fq.gz', '120813_R2.fq.gz', '120820_R2.fq.gz', '120823_R2.fq.gz', '120828_R2.fq.gz', '120903_R2.fq.gz', '120910_R2.fq.gz', '120920_R2.fq.gz', '120924_R2.fq.gz', '121001_R2.fq.gz', '121004_R2.fq.gz', '121015_R2.fq.gz', '121022_R2.fq.gz', '121028_R2.fq.gz', '121105_R2.fq.gz', '121123_R2.fq.gz', '121128_R2.fq.gz', '121220_R2.fq.gz']
+# sample names (used to tag reads back to their corresponding sample)
+sample_names: ['120314_R1', '120322_R1', '120328_R1', '120403_R1', '120416_R1', '120419_R1', '120423_R1', '120507_R1', '120516_R1', '120521_R1', '120531_R1', '120604_R1', '120613_R1', '120619_R1', '120628_R1', '120705_R1', '120709_R1', '120717_R1', '120802_R1', '120806_R1', '120813_R1', '120820_R1', '120823_R1', '120828_R1', '120903_R1', '120910_R1', '120920_R1', '120924_R1', '121001_R1', '121004_R1', '121015_R1', '121022_R1', '121028_R1', '121105_R1', '121123_R1', '121128_R1', '121220_R1', '120314_R2', '120322_R2', '120328_R2', '120403_R2', '120416_R2', '120419_R2', '120423_R2', '120507_R2', '120516_R2', '120521_R2', '120531_R2', '120604_R2', '120613_R2', '120619_R2', '120628_R2', '120705_R2', '120709_R2', '120717_R2', '120802_R2', '120806_R2', '120813_R2', '120820_R2', '120823_R2', '120828_R2', '120903_R2', '120910_R2', '120920_R2', '120924_R2', '121001_R2', '121004_R2', '121015_R2', '121022_R2', '121028_R2', '121105_R2', '121123_R2', '121128_R2', '121220_R2']
+# merged filename
+merged_filename: "/proj/b2010008/nobackup/projects/crispr/data/merged_tsamples.fq.gz"
+...

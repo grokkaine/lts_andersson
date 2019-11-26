@@ -1,0 +1,63 @@
+
+
+rule trimming:
+    """Trim reads using Cutadapt"""
+    input:
+        sample_1=os.path.join(config["run_dir"],"linked_samples","{sample_name}_R1.fq.gz"),
+        sample_2=os.path.join(config["run_dir"],"linked_samples","{sample_name}_R2.fq.gz")
+    output:
+        sample_1=os.path.join(config["run_dir"],"trimmed","{sample_name}_R1.trimmed.fq.gz"),
+        sample_2=os.path.join(config["run_dir"],"trimmed","{sample_name}_R2.trimmed.fq.gz"),
+        log=os.path.join(config["run_dir"],"cutadapt","{sample_name}_trimmed.log")
+    params:
+        adapter="AGATCGGAAGAG",
+        run_dir=config["run_dir"]
+    shell:
+        """
+        mkdir -p {params.run_dir}trimmed
+        mkdir -p {params.run_dir}cutadapt
+        cutadapt -m 50 --length-tag "length=" -q 20 -a {params.adapter} \
+        -A {params.adapter} -o {output.sample_1} -p {output.sample_2} \
+        {input.sample_1} {input.sample_2} > {output.log}
+        """
+
+
+rule merge_samples:
+    """Download the SRA data"""
+    input:
+        file_list=expand(os.path.join(config["run_dir"],"linked_samples","{sample_name}_R1.fq.gz"),sample_name=config["sample_names"]) + \
+                  expand(os.path.join(config["run_dir"],"linked_samples","{sample_name}_R2.fq.gz"),sample_name=config["sample_names"])
+    output:
+        file=os.path.join(config["run_dir"],"merging.done")
+    params:
+        sample_list=expand("{sample_name}_R1",sample_name=config["sample_names"])+expand("{sample_name}_R2",sample_name=config["sample_names"]),
+        mergedfile=os.path.join(config["run_dir"],"lmo_merged.fastq.gz")
+    run:
+        import sys
+        if not config["source_path"] in sys.path:
+            sys.path.append(config["source_path"])
+        import preprocessing
+        #preprocessing.test(output.file)
+        print("Input.file_list",input.file_list)
+        print("Params.sample_list",params.sample_list)
+        preprocessing.merge_fq(params.mergedfile, input.file_list, params.sample_list)
+        with open(output.file,"wt") as f:
+            f.write("Done!")
+
+
+rule run_crass:
+    """Run the CRASS program to retrieve CRISPR sequences"""
+    input:
+        file=os.path.join(config["run_dir"],"merging.done")
+    output:
+        file=os.path.join(config["run_dir"],"crass","crass.crispr")
+    params:
+        crass_location=config["crass_location"],
+        outdir=os.path.join(config["run_dir"],"crass"),
+        mergedfile=os.path.join(config["run_dir"],"lmo_merged.fastq.gz")
+    shell:
+        """
+        mkdir -p {params.outdir}
+        cd {params.outdir}
+        {params.crass_location}crass -o ./ -l 3 {params.mergedfile} >./run_lmo.log 2>&1
+        """

@@ -1,0 +1,37 @@
+rule reindex_samples:
+    input:
+        #file=os.path.join(config["raw_files_dir"],"{sample_name}_with_i_s_{orientation}.fq.gz")
+        file="f{i}.txt.gz"
+    output:
+        #file=os.path.join(config["run_dir"],"reindexed","{sample_name}_{orientation}_reindexed.fastq.gz")
+        file=os.path.join(config["run_dir"],"f{i}_re.txt.gz")
+    params:
+        reindexing_script=os.path.join(config["source_path"],"scripts","reindex.py")
+    shell:
+        """
+        set -e
+        set -o pipefail
+        python3 {params.reindexing_script} <(gunzip -c {input.file}) >(gzip --stdout >{output.file})
+        """
+
+rule run_crass:
+    """Run the CRASS program to retrieve CRISPR sequences"""
+    input:
+        #files=expand(os.path.join(config["run_dir"],"reindexed","{sample_name}_{orientation}_reindexed.fastq.gz"),sample_name=config["sample_names"],orientation=['R1','R2'])
+        files=expand(os.path.join(config["run_dir"],"f{i}_re.txt.gz"),i=['1','2','3'])
+    output:
+        file=os.path.join(config["run_dir"],"crass","crass.crispr")
+    params:
+        crass_location=config["crass_location"],
+        outdir=os.path.join(config["run_dir"],"crass")
+    shell:
+        """
+        set -e
+        set -o pipefail
+        mkdir -p {params.outdir}
+        cd {params.outdir}
+        #cat <(zcat {input.files}) > {params.outdir}/crass.crispr
+        #{params.crass_location}crass -o ./ -l 3 <(cat f1.txt.gz f2.txt.gz f3.txt.gz) >./run.log 2>&1
+        #{params.crass_location}crass -o ./ -l 3 {input.files} >./run.log 2>&1
+        {params.crass_location}crass -o ./ -l 3 <(cat {input.files}) >./run.log 2>&1
+        """
